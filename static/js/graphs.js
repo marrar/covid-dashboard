@@ -6,13 +6,11 @@ function makeGraphs(error, recordsJson) {
 	
 	//Clean data
 	var records = recordsJson;
-//	var dateFormat = d3.time.format("%Y-%m-%d %H:%M:%S");
         var dateFormat = d3.time.format("%m/%d/%y %H:%M");	
 	records.forEach(function(d) {
 		d["timestamp"] = dateFormat.parse(d["timestamp"]);
 		d["timestamp"].setHours(0);
 		d["timestamp"].setMinutes(0);
-	//	d["timestamp"].setSeconds(0);
 		d["longitude"] = +d["longitude"];
 		d["latitude"] = +d["latitude"];
 	});
