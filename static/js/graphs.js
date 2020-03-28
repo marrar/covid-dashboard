@@ -6,12 +6,13 @@ function makeGraphs(error, recordsJson) {
 	
 	//Clean data
 	var records = recordsJson;
-	var dateFormat = d3.time.format("%Y-%m-%d %H:%M:%S");
-	
+//	var dateFormat = d3.time.format("%Y-%m-%d %H:%M:%S");
+        var dateFormat = d3.time.format("%m/%d/%y %H:%M");	
 	records.forEach(function(d) {
 		d["timestamp"] = dateFormat.parse(d["timestamp"]);
+		d["timestamp"].setHours(0);
 		d["timestamp"].setMinutes(0);
-		d["timestamp"].setSeconds(0);
+	//	d["timestamp"].setSeconds(0);
 		d["longitude"] = +d["longitude"];
 		d["latitude"] = +d["latitude"];
 	});
@@ -23,7 +24,7 @@ function makeGraphs(error, recordsJson) {
 	var dateDim = ndx.dimension(function(d) { return d["timestamp"]; });
 	var genderDim = ndx.dimension(function(d) { return d["gender"]; });
 	var ageSegmentDim = ndx.dimension(function(d) { return d["age_segment"]; });
-	var phoneBrandDim = ndx.dimension(function(d) { return d["phone_brand_en"]; });
+	var symptomsDim = ndx.dimension(function(d) { return d["symptoms"]; });
 	var locationdDim = ndx.dimension(function(d) { return d["location"]; });
 	var allDim = ndx.dimension(function(d) {return d;});
 
@@ -32,7 +33,7 @@ function makeGraphs(error, recordsJson) {
 	var numRecordsByDate = dateDim.group();
 	var genderGroup = genderDim.group();
 	var ageSegmentGroup = ageSegmentDim.group();
-	var phoneBrandGroup = phoneBrandDim.group();
+	var symptomsGroup = symptomsDim.group();
 	var locationGroup = locationdDim.group();
 	var all = ndx.groupAll();
 
@@ -47,7 +48,7 @@ function makeGraphs(error, recordsJson) {
 	var timeChart = dc.barChart("#time-chart");
 	var genderChart = dc.rowChart("#gender-row-chart");
 	var ageSegmentChart = dc.rowChart("#age-segment-row-chart");
-	var phoneBrandChart = dc.rowChart("#phone-brand-row-chart");
+	var symptomsChart = dc.rowChart("#phone-brand-row-chart");
 	var locationChart = dc.rowChart("#location-row-chart");
 
 
@@ -89,11 +90,11 @@ function makeGraphs(error, recordsJson) {
         .labelOffsetY(10)
         .xAxis().ticks(4);
 
-	phoneBrandChart
+	symptomsChart
 		.width(300)
 		.height(310)
-        .dimension(phoneBrandDim)
-        .group(phoneBrandGroup)
+        .dimension(symptomsDim)
+        .group(symptomsGroup)
         .ordering(function(d) { return -d.value })
         .colors(['#6baed6'])
         .elasticX(true)
@@ -114,12 +115,12 @@ function makeGraphs(error, recordsJson) {
 
 	var drawMap = function(){
 
-	    map.setView([31.75, 110], 4);
+	    map.setView([-34.6,-58.4], 10);
 		mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
 		L.tileLayer(
 			'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				attribution: '&copy; ' + mapLink + ' Contributors',
-				maxZoom: 15,
+				maxZoom: 20,
 			}).addTo(map);
 
 		//HeatMap
@@ -127,11 +128,21 @@ function makeGraphs(error, recordsJson) {
 		_.each(allDim.top(Infinity), function (d) {
 			geoData.push([d["latitude"], d["longitude"], 1]);
 	      });
+		
 		var heat = L.heatLayer(geoData,{
 			radius: 10,
 			blur: 20, 
 			maxZoom: 1,
-		}).addTo(map);
+		}).addTo(map); 
+		/*
+		for (var i=0; i<geoData.length,i++){
+			var heat = L.circle([geoData[i][0], geoData[i][1]], {
+				color:'red'
+				fillColor:'#f03',
+				fillOpacity: 0.5,
+				radius=500
+			})
+		}*/
 
 	};
 
@@ -139,7 +150,7 @@ function makeGraphs(error, recordsJson) {
 	drawMap();
 
 	//Update the heatmap if any dc chart get filtered
-	dcCharts = [timeChart, genderChart, ageSegmentChart, phoneBrandChart, locationChart];
+	dcCharts = [timeChart, genderChart, ageSegmentChart, symptomsChart, locationChart];
 
 	_.each(dcCharts, function (dcChart) {
 		dcChart.on("filtered", function (chart, filter) {
