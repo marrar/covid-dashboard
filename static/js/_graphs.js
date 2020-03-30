@@ -6,12 +6,11 @@ function makeGraphs(error, recordsJson) {
 	
 	//Clean data
 	var records = recordsJson;
-        //var dateFormat = d3.time.format("%m/%d/%y %H:%M");	
-	var dateFormat = d3.time.format("%d/%m/%Y");
+        var dateFormat = d3.time.format("%m/%d/%y %H:%M");	
 	records.forEach(function(d) {
 		d["timestamp"] = dateFormat.parse(d["timestamp"]);
-//		d["timestamp"].setHours(0);
-//		d["timestamp"].setMinutes(0);
+		d["timestamp"].setHours(0);
+		d["timestamp"].setMinutes(0);
 		d["longitude"] = +d["longitude"];
 		d["latitude"] = +d["latitude"];
 	});
@@ -123,30 +122,48 @@ function makeGraphs(error, recordsJson) {
 			}).addTo(map);
 
 		//Circles
-	
+		var geoData = [];
+		_.each(allDim.top(Infinity), function (d) {
+			geoData.push([d["latitude"],d["longitude"], 1]);
+		});
+		for (var i=0; i<geoData.length; i++){
+			let ArrLatLng = [geoData[i][0], geoData[i][1]]
+				L.circle(L.latLng(ArrLatLng),5,{
+					color:"red",
+					fillColor:'#f03'
+					fillOpacity: 0.5,
+				}).addTo(map);
+		}
+	};
+	/*	
+		//HeatMap
 		var geoData = [];
 		_.each(allDim.top(Infinity), function (d) {
 			geoData.push([d["latitude"], d["longitude"], 1]);
 	      });
-		  
-		  
-		for (var i=0; i<geoData.length;i++){
-			let ArrLatLng= [geoData[i][0], geoData[i][1]]
-			// El 10 es el radio del Circle 
-			L.circle(L.latLng(ArrLatLng), 10, {
-				color:"red",
-				fillColor:"#f03",
-				fillOpacity: 0.5,
-			}).addTo(map); 
-		}
 		
+		var heat = L.heatLayer(geoData,{
+			radius: 10,
+			blur: 20, 
+			maxZoom: 1,
+		}).addTo(map); 
+		*/
+		/*
+		for (var i=0; i<geoData.length,i++){
+			var heat = L.circle([geoData[i][0], geoData[i][1]], {
+				color:'red'
+				fillColor:'#f03',
+				fillOpacity: 0.5,
+				radius=500
+			})
+		}*/
 
-	};
+	//};
 
 	//Draw Map
 	drawMap();
 
-	//Update the circles if any dc chart get filtered
+	//Update the heatmap if any dc chart get filtered
 	dcCharts = [timeChart, genderChart, ageSegmentChart, symptomsChart, locationChart];
 
 	_.each(dcCharts, function (dcChart) {
