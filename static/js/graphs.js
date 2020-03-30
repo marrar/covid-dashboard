@@ -38,9 +38,9 @@ function makeGraphs(error, recordsJson) {
 
 
 	//Define values (to be used in charts)
-	var minDate = dateDim.bottom(1)[0]["timestamp"];
+	// var minDate = dateDim.bottom(1)[0]["timestamp"];
+	var minDate = new Date(2020, 0, 1);
 	var maxDate = dateDim.top(1)[0]["timestamp"];
-
 
     //Charts
     var numberRecordsND = dc.numberDisplay("#number-records-nd");
