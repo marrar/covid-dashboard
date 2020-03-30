@@ -6,3 +6,10 @@
     fill: black;
 
 }
+
+.text-muted{
+	color: #b9b9b9 !important;
+}
+.text-muted a{
+	color: #b5d4ef;
+}

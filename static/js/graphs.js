@@ -16,6 +16,14 @@ function makeGraphs(error, recordsJson) {
 		d["latitude"] = +d["latitude"];
 	});
 
+	//Dejo sólo los del año 2020
+	records = records.filter(d => {
+		if (d["timestamp"].toString().slice(11,15) !== '2020'){
+			console.log(d);
+		}
+		return d["timestamp"].toString().slice(11,15) === '2020'
+	});
+
 	//Create a Crossfilter instance
 	var ndx = crossfilter(records);
 
@@ -38,9 +46,9 @@ function makeGraphs(error, recordsJson) {
 
 
 	//Define values (to be used in charts)
-	// var minDate = dateDim.bottom(1)[0]["timestamp"];
-	var minDate = new Date(2020, 0, 1);
+	var minDate = dateDim.bottom(1)[0]["timestamp"];
 	var maxDate = dateDim.top(1)[0]["timestamp"];
+
 
     //Charts
     var numberRecordsND = dc.numberDisplay("#number-records-nd");
@@ -59,7 +67,7 @@ function makeGraphs(error, recordsJson) {
 
 
 	timeChart
-		.width(650)
+		.width(750)
 		.height(140)
 		.margins({top: 10, right: 50, bottom: 20, left: 20})
 		.dimension(dateDim)
@@ -71,7 +79,7 @@ function makeGraphs(error, recordsJson) {
 
 	genderChart
         .width(300)
-        .height(100)
+        .height(150)
         .dimension(genderDim)
         .group(genderGroup)
         .ordering(function(d) { return -d.value })
@@ -100,8 +108,8 @@ function makeGraphs(error, recordsJson) {
         .xAxis().ticks(4);
 
     locationChart
-    	.width(200)
-		.height(510)
+    	.width(290)
+		.height(662)
         .dimension(locationdDim)
         .group(locationGroup)
         .ordering(function(d) { return -d.value })
@@ -111,10 +119,10 @@ function makeGraphs(error, recordsJson) {
         .xAxis().ticks(4);
 
     var map = L.map('map');
+    map.setView([-34.6,-58.4], 10);
 
+let arr = [];
 	var drawMap = function(){
-
-	    map.setView([-34.6,-58.4], 10);
 		mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
 		L.tileLayer(
 			'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -128,20 +136,54 @@ function makeGraphs(error, recordsJson) {
 		_.each(allDim.top(Infinity), function (d) {
 			geoData.push([d["latitude"], d["longitude"], 1]);
 	      });
-		  
-		  
+		  	  
+
+		arr = [];
+		let radius = getRadius();
 		for (var i=0; i<geoData.length;i++){
 			let ArrLatLng= [geoData[i][0], geoData[i][1]]
 			// El 10 es el radio del Circle 
-			L.circle(L.latLng(ArrLatLng), 10, {
-				color:"red",
-				fillColor:"#f03",
-				fillOpacity: 0.5,
+			arr[i] = L.circleMarker(L.latLng(ArrLatLng), {
+				radius: radius,
+				color: '#ff3f00',
+				fillColor: '#ff3f00',
+    			fillOpacity: 1
 			}).addTo(map); 
 		}
-		
+
 
 	};
+
+	var getRadius = function() {
+	  	let zoom = map.getZoom() 
+
+		// Multiply that by a factor based on how large the circle should appear on the screen
+		let radius = zoom * 0.05;
+		if (zoom >= 18) {
+			radius = zoom * 0.5;
+		} else if (zoom >= 16) {
+			radius = zoom * 0.5;
+		} else if (zoom >= 15) {
+ 			radius = zoom * 0.25;
+		} else if (zoom >= 14) {
+ 			radius = zoom * 0.2;
+		} else if (zoom >= 13) {
+ 			radius = zoom * 0.15;
+		} else if (zoom >= 12) {
+ 			radius = zoom * 0.1;
+		}
+
+		return radius;
+	};
+
+	map.on('zoomend', function (e) {
+		let zoom = getRadius();
+		for (let i=0; i<arr.length; i++){
+			arr[i].setRadius(zoom);
+		}
+	});
+	
+
 
 	//Draw Map
 	drawMap();

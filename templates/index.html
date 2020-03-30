@@ -9,6 +9,42 @@
   <link rel="stylesheet" href="./static/css/custom.css">
   
 
+<style>
+  body{
+    min-width: 983px;
+    overflow: scroll;
+  }
+  .navbar{
+    background: #7b899a !important;
+  }
+  .title{
+    color: white !important;
+    font-size: 2em;
+  }
+  .col-sm-6-custom{
+    width: 45em !important;
+    display: inline-block;
+  }
+  svg {
+    position: relative;
+    right: 1.5em;
+  }
+  .inline {
+    display: inline-grid;
+  }
+
+  @media only screen and (max-width: 1235px) {
+    .bloque-barras{
+      width: 100% !important;
+      display: inline-flex !important;
+    }
+    .bloque-barras .chart-wrapper{
+      display: table-column;
+      width: 275px !important;
+      margin-right: 2em;
+    }
+  }
+</style>
 
 </head>
 <body class="application">
@@ -16,9 +52,10 @@
   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
       <div class="navbar-header">
-	      <div class="navbar-brand"> 
+	      <div class="navbar-brand title"> 
 		      COVID-19 Visualizaci&oacuten
 	      </div>
+      </div>
     </div>
   </div>
 
@@ -26,126 +63,96 @@
 
     <div class="row">
 
-      <div class="col-sm-6">
-        <div class="row">
+      <div class="inline" style="width:700px">
 
-          <!-- Time Chart --> 
-          <div class="col-sm-12">
-            <div class="chart-wrapper">
-              <div class="chart-title">
-                Casos reportados
-              </div>
-              <div class="chart-stage">
-                <div id="time-chart"></div>
-              </div>
-            </div>
+      <!-- Map -->  
+      <div style="width:700px">  
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Map
           </div>
-          <!-- Time Chart --> 
-
-          <!-- Brand -->
-          <div class="col-sm-6">
-            <div class="chart-wrapper">
-              <div class="chart-title">
-                Clasificaci&oacuten Epidemiol&oacutegica 
-              </div>
-              <div class="chart-stage">
-                <div id="phone-brand-row-chart"></div>
-              </div>
-            </div>
+          <div class="chart-stage">
+            <div id="map" style="width: 100%; height: 50em"></div>
           </div>
-          <!-- Brand -->
-
-
-          <div class="col-sm-6">
-
-            <div class="row">
-            <!-- Gender -->
-            <div class="col-sm-12">
-              <div class="chart-wrapper">
-                <div class="chart-title">
-                  Resultado
-                </div>
-                <div class="chart-stage">
-                  <div id="gender-row-chart"></div>
-                </div>
-              </div>
-            </div>
-            </div>
-            <!-- Gender -->
-
-            <!-- Age Segment -->
-            <div class="row">
-            <div class="col-sm-12">
-              <div class="chart-wrapper">
-                <div class="chart-title">
-                  Grupo etario
-                </div>
-                <div class="chart-stage">
-                  <div id="age-segment-row-chart"></div>
-                </div>
-              </div>
-            </div>
-            <!-- Age Segment -->
-          </div>
-          </div>
-
-
         </div>
       </div>
+      <!-- Map -->  
 
-
-      <div class="col-sm-2">
-        <div class="row">
-
-          <!-- Chinese Province -->  
-          <div class="col-sm-12">
-            <div class="chart-wrapper">
-              <div class="chart-title">
-                Provincia 
-              </div>
-              <div class="chart-stage">
-                <div id="location-row-chart"></div>
-              </div>
-            </div>
+      <!-- Time Chart --> 
+      <div style="width:700px">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Fecha Inicio de S&iacutentomas
           </div>
-          <!-- Chinese Province -->  
+          <div class="chart-stage">
+            <div id="time-chart"></div>
+          </div>
         </div>
       </div>
+      <!-- Time Chart --> 
 
+      </div>
 
-
-      <div class="col-sm-4">
-
-        <div class="row">
-          <!-- Map -->  
-          <div class="col-sm-12"> 
-            <div class="chart-wrapper">
-              <div class="chart-title">
-                Map
-              </div>
-              <div class="chart-stage">
-                <div id="map" style="width: 400px; height: 380px"></div>
-              </div>
+        
+      <div class="inline" style="width:250px">
+        <!-- Number of events -->  
+        <div class="inline" style="width:100%">
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              Casos reportados
+            </div>
+            <div class="chart-stage">
+              <div id="number-records-nd"></div>
             </div>
           </div>
-          <!-- Map -->  
         </div>
+        <!-- Number of events -->  
 
-        <div class="row">
-          <!-- Number of events -->  
-          <div class="col-sm-12"> 
-            <div class="chart-wrapper">
-              <div class="chart-title">
-                Casos reportados
-              </div>
-              <div class="chart-stage">
-                <div id="number-records-nd"></div>
-              </div>
+        <!-- Chinese Province -->  
+          <div class="chart-wrapper inline" style="width:100%">
+            <div class="chart-title">
+              Provincia 
+            </div>
+            <div class="chart-stage">
+              <div id="location-row-chart"></div>
             </div>
           </div>
-          <!-- Number of events -->  
-        </div>
+        <!-- Chinese Province -->  
+      </div>
 
+      <div class="inline bloque-barras" style="width:250px">
+        <!-- Clasificaci&oacuten Epidemiol&oacutegica Segment -->
+        <div class="chart-wrapper inline" style="width:100%">
+          <div class="chart-title">
+            Clasificaci&oacuten Epidemiol&oacutegica 
+          </div>
+          <div class="chart-stage">
+            <div id="phone-brand-row-chart"></div>
+          </div>
+        </div>
+        <!-- Clasificaci&oacuten Epidemiol&oacutegica Segment --> 
+
+        <!-- Age Segment -->
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              Grupo etario
+            </div>
+            <div class="chart-stage">
+              <div id="age-segment-row-chart"></div>
+            </div>
+          </div>
+        <!-- Age Segment -->
+
+        <!-- Gender -->
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              Resultado
+            </div>
+            <div class="chart-stage">
+              <div id="gender-row-chart"></div>
+            </div>
+          </div>
+        <!-- Gender -->
       </div>
 
     </div>
