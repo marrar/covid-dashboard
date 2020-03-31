@@ -41,7 +41,7 @@ def index():
 
 @app.route("/data")
 def get_data():
-    sisa = pd.read_csv(data_path + 'SISA_29_03_09_07_para_MINCYT/Reporte-Table1.csv')
+    sisa = pd.read_csv(data_path + 'Reporte-Table1.csv')
     cols_to_keep_sisa = ['CLASIF_RESUMEN', 'CLASIF_EPIDEMIO','FIS','GRUPO_ETARIO', 'PROVINCIA_CARGA']
     sisa = sisa[cols_to_keep_sisa].dropna()
     sisa['CLASIF_EPIDEMIO']=sisa['CLASIF_EPIDEMIO'].replace("En Investigación", "En Inv.")
