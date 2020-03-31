@@ -13,3 +13,68 @@
 .text-muted a{
 	color: #b5d4ef;
 }
+
+  body{
+    min-width: 983px;
+    overflow: scroll;
+  }
+  .navbar{
+    background: #7b899a !important;
+  }
+  .title{
+    color: white !important;
+    font-size: 2em;
+  }
+  .col-sm-6-custom{
+    width: 45em !important;
+    display: inline-block;
+  }
+  svg {
+    position: relative;
+    right: 1.5em;
+  }
+  .inline {
+    display: inline-grid;
+  }
+
+  .hidden {
+    display: none;
+  } 
+
+  #resetCircles {
+    position: absolute;
+    top: 4em;
+    z-index: 9999;
+    right: 1.46em;
+    width: 2.4em;
+    height: 2.4em;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 0;
+    box-shadow: none;
+    border: 1px solid grey;
+    cursor: pointer;
+  }
+  #resetCircles a{
+    height: 100%;
+    width: 100%;
+  }
+  #resetCircles .x-icon{
+    position: absolute;
+    background: transparent;
+    font-size: 2.5em;
+    top: 0.1em;
+    color: red;
+  }
+
+  @media only screen and (max-width: 1235px) {
+    .bloque-barras{
+      width: 100% !important;
+      display: inline-flex !important;
+    }
+    .bloque-barras .chart-wrapper{
+      display: table-column;
+      width: 275px !important;
+      margin-right: 2em;
+    }
+  }

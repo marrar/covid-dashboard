@@ -6,6 +6,7 @@ function makeGraphs(error, recordsJson) {
 	
 	//Clean data
 	var records = recordsJson;
+
         //var dateFormat = d3.time.format("%m/%d/%y %H:%M");	
 	var dateFormat = d3.time.format("%d/%m/%Y");
 	records.forEach(function(d) {
@@ -14,6 +15,7 @@ function makeGraphs(error, recordsJson) {
 //		d["timestamp"].setMinutes(0);
 		d["longitude"] = +d["longitude"];
 		d["latitude"] = +d["latitude"];
+		d["lat_lon"] = d["latitude"]+"_"+d["longitude"];
 	});
 
 	//Dejo sólo los del año 2020
@@ -30,6 +32,7 @@ function makeGraphs(error, recordsJson) {
 	//Define Dimensions
 	var dateDim = ndx.dimension(function(d) { return d["timestamp"]; });
 	var genderDim = ndx.dimension(function(d) { return d["gender"]; });
+	var mapDim = ndx.dimension(function(d) { return d["lat_lon"]; });
 	var ageSegmentDim = ndx.dimension(function(d) { return d["age_segment"]; });
 	var symptomsDim = ndx.dimension(function(d) { return d["symptoms"]; });
 	var locationdDim = ndx.dimension(function(d) { return d["location"]; });
@@ -39,6 +42,7 @@ function makeGraphs(error, recordsJson) {
 	//Group Data
 	var numRecordsByDate = dateDim.group();
 	var genderGroup = genderDim.group();
+	var mapGroup = mapDim.group();
 	var ageSegmentGroup = ageSegmentDim.group();
 	var symptomsGroup = symptomsDim.group();
 	var locationGroup = locationdDim.group();
@@ -58,13 +62,10 @@ function makeGraphs(error, recordsJson) {
 	var symptomsChart = dc.rowChart("#phone-brand-row-chart");
 	var locationChart = dc.rowChart("#location-row-chart");
 
-
-
 	numberRecordsND
 		.formatNumber(d3.format("d"))
 		.valueAccessor(function(d){return d; })
 		.group(all);
-
 
 	timeChart
 		.width(750)
@@ -121,8 +122,12 @@ function makeGraphs(error, recordsJson) {
     var map = L.map('map');
     map.setView([-34.6,-58.4], 10);
 
-let arr = [];
+	let arrCircles = [];
+	let circlesToShow = [];
 	var drawMap = function(){
+		map.eachLayer(function (layer) {
+			map.removeLayer(layer)
+		}); 
 		mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
 		L.tileLayer(
 			'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -138,21 +143,72 @@ let arr = [];
 	      });
 		  	  
 
-		arr = [];
+		arrCircles = [];
 		let radius = getRadius();
-		for (var i=0; i<geoData.length;i++){
-			let ArrLatLng= [geoData[i][0], geoData[i][1]]
-			// El 10 es el radio del Circle 
-			arr[i] = L.circleMarker(L.latLng(ArrLatLng), {
-				radius: radius,
-				color: '#ff3f00',
-				fillColor: '#ff3f00',
-    			fillOpacity: 1
-			}).addTo(map); 
+		if (circlesToShow.length === 0) {
+			for (var i=0; i<geoData.length;i++){
+				let ArrLatLng= [geoData[i][0], geoData[i][1]]
+				arrCircles['c_'+i] = L.circleMarker(L.latLng(ArrLatLng), {
+					radius: radius,
+					color: '#ff3f00',
+					fillColor: '#ff3f00',
+	    			fillOpacity: 1
+				}).addTo(map); 
+			}	
+		} else {
+			for (var i=0; i<circlesToShow.length;i++){
+				if (geoData.some(d => { return d[0] === circlesToShow[i][0] && d[1] === circlesToShow[i][1]})){
+					let ArrLatLng= [circlesToShow[i][0], circlesToShow[i][1]]
+					arrCircles['c_'+i] = L.circleMarker(L.latLng(ArrLatLng), {
+						radius: radius,
+						color: '#3388ff',
+						fillColor: '#3388ff',
+		    			fillOpacity: 1
+					}).addTo(map); 
+				}
+			}	
 		}
+		
 
 
 	};
+
+	$('#resetCircles').click(() => {
+		$('#resetCircles').addClass('hidden');
+		resetCircles();
+	})
+	function resetCircles(){
+		mapDim.filterAll();
+		circlesToShow = [];
+	    dc.redrawAll();	
+		drawMap();
+	}
+	const lassoControl = L.control.lasso().addTo(map);
+		map.on('lasso.finished', event => {		    
+			$('#resetCircles').removeClass('hidden');
+            setSelectedLayers(event.layers);
+        });
+	function multivalue_filter(values) {
+	    return function(v) {
+	        return values.indexOf(v) !== -1;
+	    };
+	}
+    function setSelectedLayers(layers) {
+    	let arr = [];
+    	circlesToShow = [];
+    	if (layers.length > 0){
+	    	layers.forEach(layer => {
+	        	circlesToShow.push([layer['_latlng']['lat'], layer['_latlng']['lng']])
+	        	arr.push(layer['_latlng']['lat']+"_"+layer['_latlng']['lng']);
+	            layer.setStyle({ color: '#3388ff', fillColor: '#3388ff' });
+	        });	
+	        mapDim.filterFunction(multivalue_filter(arr))
+    	} else {
+    		mapDim.filterAll();
+    	}
+        dc.redrawAll();
+        drawMap();
+    }
 
 	var getRadius = function() {
 	  	let zoom = map.getZoom() 
@@ -178,8 +234,8 @@ let arr = [];
 
 	map.on('zoomend', function (e) {
 		let zoom = getRadius();
-		for (let i=0; i<arr.length; i++){
-			arr[i].setRadius(zoom);
+		for (let key in arrCircles) {
+			arrCircles[key].setRadius(zoom);
 		}
 	});
 	
@@ -193,9 +249,6 @@ let arr = [];
 
 	_.each(dcCharts, function (dcChart) {
 		dcChart.on("filtered", function (chart, filter) {
-			map.eachLayer(function (layer) {
-				map.removeLayer(layer)
-			}); 
 			drawMap();
 		});
 	});
